@@ -1,0 +1,24 @@
+---
+title: "Project Code"
+author: "Brennan"
+date: "4/3/2018"
+output: html_document
+---
+In this project, we will be exploring the following questions:
+1. How are injuries and fatalities related to population? Distance (length) of landslide?
+2. What landslide types are most fatal? Longest? Same for landslide trigger. 
+3. How does landslide fatality, length, trigger, and time of year vary globally? (Use of maps) 
+4. Is there any seasonal behavior with landslides/check the frequency of landfalls in different location? (Make use of time series analysis)
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(tidyverse)
+library(RTseries)
+```
+
+```{r}
+data<-read.csv("/Users/quinngoodman/Desktop/STAT/STAT 480/Project/catalog.csv")
+head(data)
+data %>% ggplot(aes(x=longitude, y=latitude, colour=landslide_type ))+geom_point()
+```
+
