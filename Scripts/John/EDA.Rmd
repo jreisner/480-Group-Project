@@ -1,0 +1,138 @@
+---
+title: "EDA"
+author: "John Reisner"
+date: "April 3, 2018"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE, fig.align = 'center', message = FALSE, warning = FALSE)
+```
+
+```{r}
+library(tidyverse)
+land <- read.csv("catalog.csv")
+```
+## Count of Landslides
+### Trigger
+```{r}
+land %>%
+  group_by(trigger) %>%
+  tally() %>%
+  arrange(n) %>%
+  mutate(trigger = factor(trigger, levels = trigger)) %>%
+  ggplot(aes(x = trigger, y = n)) +
+  geom_bar(stat = "identity") +
+  coord_flip() +
+  theme_bw()
+```
+
+### Size
+```{r}
+land %>%
+  group_by(landslide_size) %>%
+  tally() %>%
+  arrange(n) %>%
+  mutate(landslide_size = factor(landslide_size, levels = landslide_size)) %>%
+  ggplot(aes(x = landslide_size, y = n)) +
+  geom_bar(stat = "identity") +
+  coord_flip() +
+  theme_bw()
+```
+
+### Type
+```{r}
+land %>%
+  group_by(landslide_type) %>%
+  tally() %>%
+  arrange(n) %>%
+  mutate(landslide_type = factor(landslide_type, levels = landslide_type)) %>%
+  ggplot(aes(x = landslide_type, y = n)) +
+  geom_bar(stat = "identity") +
+  coord_flip() +
+  theme_bw()
+```
+
+### Landslides in each country
+```{r}
+land %>%
+  group_by(country_name) %>%
+  tally() %>%
+  arrange(n) %>%
+  mutate(country_name = factor(country_name, levels = country_name)) %>%
+  ggplot(aes(x = country_name, y = n)) +
+  geom_bar(stat = "identity") +
+  coord_flip() +
+  theme_bw()
+```
+
+
+## Total Fatalities
+
+### Trigger
+```{r}
+land %>%
+  group_by(trigger) %>%
+  summarise(Deaths = sum(fatalities, na.rm = TRUE)) %>%
+  arrange(Deaths) %>%
+  mutate(trigger = factor(trigger, levels = trigger)) %>%
+  ggplot(aes(x = trigger, y = Deaths)) +
+  geom_bar(stat = "identity") +
+  coord_flip() +
+  theme_bw()
+```
+
+### Size
+```{r}
+land %>%
+  group_by(landslide_size) %>%
+  summarise(Deaths = sum(fatalities, na.rm = TRUE)) %>%
+  arrange(Deaths) %>%
+  mutate(landslide_size = factor(landslide_size, levels = landslide_size)) %>%
+  ggplot(aes(x = landslide_size, y = Deaths)) +
+  geom_bar(stat = "identity") +
+  coord_flip() +
+  theme_bw()
+```
+
+### Type
+```{r}
+land %>%
+  group_by(landslide_type) %>%
+  summarise(Deaths = sum(fatalities, na.rm = TRUE)) %>%
+  arrange(Deaths) %>%
+  mutate(landslide_type = factor(landslide_type, levels = landslide_type)) %>%
+  ggplot(aes(x = landslide_type, y = Deaths)) +
+  geom_bar(stat = "identity") +
+  coord_flip() +
+  theme_bw()
+```
+
+### In each country
+```{r}
+land %>%
+  group_by(country_name) %>%
+  summarise(Deaths = sum(fatalities, na.rm = TRUE)) %>%
+  arrange(Deaths) %>%
+  mutate(country_name = factor(country_name, levels = country_name)) %>%
+  ggplot(aes(x = country_name, y = Deaths)) +
+  geom_bar(stat = "identity") +
+  coord_flip() +
+  theme_bw()
+```
+
+
+
+### Mean fatalities per country
+```{r}
+land %>%
+  group_by(country_name) %>%
+  summarise(Fatals = mean(fatalities, na.rm = TRUE)) %>%
+  arrange(Fatals) %>%
+  mutate(country_name = factor(country_name, levels = country_name)) %>%
+  ggplot(aes(x = country_name, y = Fatals)) +
+  geom_bar(stat = "identity") +
+  coord_flip() +
+  theme_bw()
+```
+
