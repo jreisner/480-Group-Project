@@ -6,22 +6,22 @@ output: html_document
 ---
 
 ```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = FALSE, fig.align = 'center', message = FALSE, warning = FALSE)
+knitr::opts_chunk$set(echo = TRUE, fig.align = 'center', message = FALSE, warning = FALSE)
 ```
 
 ```{r}
 library(tidyverse)
-land <- read.csv("catalog.csv")
+land <- read.csv("Global_Landslide_Catalog_Export.csv")
 ```
 ## Count of Landslides
 ### Trigger
 ```{r}
 land %>%
-  group_by(trigger) %>%
+  group_by(landslide_trigger) %>%
   tally() %>%
   arrange(n) %>%
-  mutate(trigger = factor(trigger, levels = trigger)) %>%
-  ggplot(aes(x = trigger, y = n)) +
+  mutate(landslide_trigger = factor(landslide_trigger, levels = landslide_trigger)) %>%
+  ggplot(aes(x = landslide_trigger, y = n)) +
   geom_bar(stat = "identity") +
   coord_flip() +
   theme_bw()
@@ -43,11 +43,9 @@ land %>%
 ### Type
 ```{r}
 land %>%
-  group_by(landslide_type) %>%
+  group_by(landslide_category) %>%
   tally() %>%
-  arrange(n) %>%
-  mutate(landslide_type = factor(landslide_type, levels = landslide_type)) %>%
-  ggplot(aes(x = landslide_type, y = n)) +
+  ggplot(aes(x = reorder(landslide_category, n, median), y = n)) +
   geom_bar(stat = "identity") +
   coord_flip() +
   theme_bw()
@@ -60,6 +58,7 @@ land %>%
   tally() %>%
   arrange(n) %>%
   mutate(country_name = factor(country_name, levels = country_name)) %>%
+  top_n(25) %>%
   ggplot(aes(x = country_name, y = n)) +
   geom_bar(stat = "identity") +
   coord_flip() +
@@ -72,11 +71,11 @@ land %>%
 ### Trigger
 ```{r}
 land %>%
-  group_by(trigger) %>%
-  summarise(Deaths = sum(fatalities, na.rm = TRUE)) %>%
+  group_by(landslide_trigger) %>%
+  summarise(Deaths = sum(fatality_count, na.rm = TRUE)) %>%
   arrange(Deaths) %>%
-  mutate(trigger = factor(trigger, levels = trigger)) %>%
-  ggplot(aes(x = trigger, y = Deaths)) +
+  mutate(landslide_trigger = factor(landslide_trigger, levels = landslide_trigger)) %>%
+  ggplot(aes(x = landslide_trigger, y = Deaths)) +
   geom_bar(stat = "identity") +
   coord_flip() +
   theme_bw()
@@ -86,7 +85,7 @@ land %>%
 ```{r}
 land %>%
   group_by(landslide_size) %>%
-  summarise(Deaths = sum(fatalities, na.rm = TRUE)) %>%
+  summarise(Deaths = sum(fatality_count, na.rm = TRUE)) %>%
   arrange(Deaths) %>%
   mutate(landslide_size = factor(landslide_size, levels = landslide_size)) %>%
   ggplot(aes(x = landslide_size, y = Deaths)) +
@@ -98,11 +97,9 @@ land %>%
 ### Type
 ```{r}
 land %>%
-  group_by(landslide_type) %>%
-  summarise(Deaths = sum(fatalities, na.rm = TRUE)) %>%
-  arrange(Deaths) %>%
-  mutate(landslide_type = factor(landslide_type, levels = landslide_type)) %>%
-  ggplot(aes(x = landslide_type, y = Deaths)) +
+  group_by(landslide_category) %>%
+  summarise(Deaths = sum(fatality_count, na.rm = TRUE)) %>%
+  ggplot(aes(x = reorder(landslide_category, Deaths, median), y = Deaths)) +
   geom_bar(stat = "identity") +
   coord_flip() +
   theme_bw()
@@ -112,9 +109,10 @@ land %>%
 ```{r}
 land %>%
   group_by(country_name) %>%
-  summarise(Deaths = sum(fatalities, na.rm = TRUE)) %>%
+  summarise(Deaths = sum(fatality_count, na.rm = TRUE)) %>%
   arrange(Deaths) %>%
   mutate(country_name = factor(country_name, levels = country_name)) %>%
+  top_n(25) %>%
   ggplot(aes(x = country_name, y = Deaths)) +
   geom_bar(stat = "identity") +
   coord_flip() +
@@ -127,9 +125,10 @@ land %>%
 ```{r}
 land %>%
   group_by(country_name) %>%
-  summarise(Fatals = mean(fatalities, na.rm = TRUE)) %>%
+  summarise(Fatals = mean(fatality_count, na.rm = TRUE)) %>%
   arrange(Fatals) %>%
   mutate(country_name = factor(country_name, levels = country_name)) %>%
+  top_n(25) %>%
   ggplot(aes(x = country_name, y = Fatals)) +
   geom_bar(stat = "identity") +
   coord_flip() +
