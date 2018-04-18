@@ -1,0 +1,92 @@
+---
+title: "Final_Project"
+author: "William Crowson"
+date: "April 3, 2018"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+library(tidyverse)
+Landslide <- read.csv("Global_Landslide_Catalog_Export.csv")
+```
+
+
+## Landslide Data Time Period
+
+```{r}
+library(lubridate)
+Landslide$event_date <- mdy_hms(Landslide$event_date)
+summary(Landslide$event_date)
+
+# Data from November 11, 1988 to September 28, 2017.
+
+```
+```{r}
+Landslide <- Landslide %>% mutate(event_year = year(event_date))
+Landslide %>% ggplot(aes(x = factor(event_year))) + geom_bar()
+
+# This data started to be compiled in 2007, as a result there are few entries containing landslides before 2007. So we will filter data to 2007 and later in all further analysis.
+
+newLandslide <- Landslide %>% filter(event_year >= 2007)
+newLandslide %>% ggplot(aes(x = factor(event_year))) + geom_bar()
+```
+
+
+## Landslide Harmfulness Versus Size
+
+```{r}
+levels(newLandslide$landslide_size)[1] <- "NA"
+newLandslide$landslide_size <- factor(newLandslide$landslide_size, levels = c("unknown", "small", "medium", "large", "very_large", "catastrophic", "NA"))
+newLandslide %>% ggplot(aes(x = landslide_size, y = log10(fatality_count))) + geom_boxplot()
+# The median fatality count increases as the landslide size increases. However the landslide with the highest fatality count was catagorized as a very large landslide. 
+
+newLandslide %>% ggplot(aes(x = landslide_size, y = log10(injury_count))) + geom_boxplot()
+# The median injury count increases with landslide size for the most part with the exception of the median injury count for catastrophic landslides being slightly lower than the median injury count for very large landslides.
+
+newLandslide <- newLandslide %>% mutate(Harmed_Count = fatality_count+injury_count)
+newLandslide %>% ggplot(aes(x = landslide_size, y = log10(Harmed_Count))) + geom_boxplot()
+# The median number of people killed or injured increases as the size of the landslide 
+
+```
+
+
+## Landslide Harmfulness Versus Population
+
+```{r}
+newLandslide %>% filter(admin_division_population != 0) %>% ggplot(aes(x = admin_division_population, y = fatality_count)) + geom_point()
+newLandslide %>% filter(admin_division_population != 0) %>% ggplot(aes(x = admin_division_population, y = injury_count)) + geom_point()
+newLandslide %>% filter(admin_division_population != 0) %>% ggplot(aes(x = admin_division_population, y = Harmed_Count)) + geom_point()
+
+# Not great plot, let's try log 10 scale on the x
+
+newLandslide %>% filter(admin_division_population != 0) %>% ggplot(aes(x = log10(admin_division_population), y = fatality_count)) + geom_point()
+newLandslide %>% filter(admin_division_population != 0) %>% ggplot(aes(x = log10(admin_division_population), y = injury_count)) + geom_point()
+newLandslide %>% filter(admin_division_population != 0) %>% ggplot(aes(x = log10(admin_division_population), y = Harmed_Count)) + geom_point()
+
+# Still not great, lets try log 10 scale on the y as well
+
+newLandslide %>% filter(admin_division_population != 0) %>% ggplot(aes(x = log10(admin_division_population), y = log10(fatality_count))) + geom_point()
+newLandslide %>% filter(admin_division_population != 0) %>% ggplot(aes(x = log10(admin_division_population), y = log10(injury_count))) + geom_point()
+newLandslide %>% filter(admin_division_population != 0) %>% ggplot(aes(x = log10(admin_division_population), y = log10(Harmed_Count))) + geom_point()
+
+# Based on these plots there seems to be no clear relation between population size at the location of a landslide and number of people harmed by the landslide.
+```
+
+
+## Most Deadly Landslide
+
+```{r}
+newLandslide$fatality_count[which.max(newLandslide$fatality_count)]
+
+# Occured in Kedarnath, India at 7:30 pm on June 16, 2013. 5000 people were killed by this landslide which was classified as a "very-large" "debris_flow" landslide triggered by "downpour". There is no data on how many people were injured.
+
+newLandslide %>% filter(fatality_count == 5000)
+
+
+```
+
+
